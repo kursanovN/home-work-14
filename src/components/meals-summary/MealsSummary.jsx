@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import styled from "styled-components";
 import { MealSummaryCard } from "./MealsSummaryCard";
 import baground from "../../assets/images/baground.png";

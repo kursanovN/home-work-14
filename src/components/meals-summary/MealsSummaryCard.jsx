@@ -17,7 +17,7 @@ export const MealSummaryCard = () => {
       </Box>
     </Container>
   );
-};
+} ;
 
 const Container = styled.div`
   width: 100%;

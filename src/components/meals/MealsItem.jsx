@@ -5,18 +5,17 @@ import { cartContext } from "../../store/CartContext";
 
 export const MealItem = ({ meal }) => {
   const { addItem } = useContext(cartContext);
-
   const addBasket = (amount) => {
-    const data = {
-      id: meal.id,
-      fixPrice: meal.fixPrice,
-      title: meal.title,
-      description: meal.description,
-      price: meal.price,
-      amount: amount,
-    };
+    // const data = {
+    //   id: meal.id,
+    //   fixPrice: meal.fixPrice,
+    //   title: meal.title,
+    //   description: meal.description,
+    //   price: meal.price,
+    //   amount: amount,
+    // };
 
-    addItem(data);
+    addItem(meal._id, +amount);
   };
 
   return (
@@ -27,7 +26,7 @@ export const MealItem = ({ meal }) => {
         <span>{meal.price} $</span>
       </ItemBlock>
       <>
-        <MealsItemForm id={meal.id} price={meal.price} onAdd={addBasket} />
+        <MealsItemForm id={meal._id} price={meal.price} onAdd={addBasket} />
       </>
     </ItemContainer>
   );

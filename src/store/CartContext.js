@@ -1,61 +1,21 @@
-import { createContext, useReducer } from "react";
+import { createContext, useEffect, useReducer } from "react";
+import { fetchRequest } from "../lib/fetchAPI";
 
 export const cartContext = createContext({
   items: [],
   totalAmount: 0,
 });
 
-const initialState = {
-  items: [],
-  totalAmount: 0,
-  isExist: false,
-};
 const cartReducer = (state, action) => {
   switch (action.type) {
     case ACTION_TYPE.ADD:
-      const isExist = state.find((item) => item.id === action.payload.id);
-
-      if (!state.length) {
-        return [action.payload];
-      }
-
-      if (!isExist) {
-        return [...state, action.payload];
-      }
-
-      const updatedItem = state.map((item) => {
-        if (item.id === action.payload.id) {
-          return {
-            ...item,
-            amount: action.payload.amount + item.amount,
-          };
-        }
-        return item;
-      });
-
-      return [...updatedItem];
+      return action.payload;
 
     case ACTION_TYPE.INCREMENT:
-      return state.map((item) => {
-        if (item.id === action.payload) {
-          return {
-            ...item,
-            amount: item.amount + 1,
-          };
-        }
-        return item;
-      });
+      return action.payload;
 
     case ACTION_TYPE.DECREMENT:
-      return state.map((item) => {
-        if (item.id === action.payload && item.amount !== 0) {
-          return {
-            ...item,
-            amount: item.amount - 1,
-          };
-        }
-        return item;
-      });
+      return action.payload;
 
     default:
       return state;
@@ -69,30 +29,86 @@ const ACTION_TYPE = {
 export const CartProvider = ({ children }) => {
   const [cartState, dispatchCartState] = useReducer(cartReducer, []);
 
-  const addItem = (data) => {
-    dispatchCartState({ type: ACTION_TYPE.ADD, payload: data });
+  async function addItem(id, amount) {
+    console.log(amount);
+    try {
+      const response = await fetchRequest(`/foods/${id}/addToBasket`, {
+        method: "POST",
+        body: { amount },
+      });
+console.log(response,'response ');
+      dispatchCartState({ type: ACTION_TYPE.ADD, payload: response.items });
+    } catch (error) {
+      new Error(error);
+    }
+  }
+
+  async function getBasket() {
+    try {
+      const response = await fetchRequest("/basket");
+      dispatchCartState({ type: ACTION_TYPE.ADD, payload: response.items });
+    } catch (error) {
+      new Error(error);
+    }
+  }
+
+  useEffect(() => {
+    getBasket();
+  }, []);
+
+  const increment = async (id, amount) => {
+    try {
+      const response = await fetchRequest(`/basketItem/${id}/update`, {
+        method: "PUT",
+        body: { amount },
+      });
+      dispatchCartState({
+        type: ACTION_TYPE.INCREMENT,
+        payload: response.items,
+      });
+
+      getBasket();
+    } catch (error) {
+      new Error(error);
+    }
   };
 
-  const orderAmount = cartState.reduce(
+  const decrement = async (id, amount) => {
+    try {
+      if (amount !== 0) {
+        const response = await fetchRequest(`/basketItem/${id}/update`, {
+          method: "PUT",
+          body: { amount },
+        });
+
+        dispatchCartState({
+          type: ACTION_TYPE.DECREMENT,
+          payload: response.items,
+        });
+      } else {
+        const response = await fetchRequest(`/basketItem/${id}/delete`, {
+          method: "DELETE",
+          body: { amount },
+        });
+
+        dispatchCartState({
+          type: ACTION_TYPE.DECREMENT,
+          payload: response.items,
+        });
+      }
+
+      getBasket();
+    } catch (error) {
+      new Error(error);
+    }
+  };
+
+  const orderAmount = cartState?.reduce(
     (prev, current) => prev + current.amount,
     0
   );
 
-  const increment = (id) => {
-    dispatchCartState({
-      type: ACTION_TYPE.INCREMENT,
-      payload: id,
-    });
-  };
-
-  const decrement = (id) => {
-    dispatchCartState({
-      type: ACTION_TYPE.DECREMENT,
-      payload: id,
-    });
-  };
-
-  const totalPrice = cartState.reduce(
+  const totalPrice = cartState?.reduce(
     (prev, current) => prev + current.price.toFixed(2) * current.amount,
     0
   );

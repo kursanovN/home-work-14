@@ -1,10 +1,10 @@
-import React, { useContext } from "react";
+import React, { memo, useContext } from "react";
 import styled from "styled-components";
 import { ReactComponent as CountMines } from "../../assets/icons/mines.svg";
 import { ReactComponent as CountPluss } from "../../assets/icons/pluss.svg";
 import { cartContext } from "../../store/CartContext";
 
-export const BasketItem = ({ title, fixPrice, amount, id }) => {
+export const BasketItem = memo(({ title, price, amount, id }) => {
   const { increment, decrement } = useContext(cartContext);
 
   return (
@@ -12,22 +12,23 @@ export const BasketItem = ({ title, fixPrice, amount, id }) => {
       <Title>{title}</Title>
       <Content>
         <PriceAndAmountContainer>
-          <Price>${fixPrice}</Price>
+          <Price>${price}</Price>
           <Amount>x{amount}</Amount>
         </PriceAndAmountContainer>
         <CounterContainer>
-          <ContainerStyleMinusBasket onClick={() => decrement(id)}>
+          <ContainerStyleMinusBasket onClick={() => decrement(id, amount - 1)}>
             <CountMines />
           </ContainerStyleMinusBasket>
 
-          <ContainerStylePlusBasket onClick={() => increment(id)}>
+          <ContainerStylePlusBasket onClick={() => increment(id, amount + 1)}>
             <CountPluss />
           </ContainerStylePlusBasket>
         </CounterContainer>
       </Content>
     </Container>
   );
-};
+});
+
 
 const Container = styled.div`
   padding: 24px 10px;

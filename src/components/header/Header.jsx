@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useContext, useEffect, useState } from "react";
+import React, { memo, useContext, useEffect, useState } from "react";
 import styled from "styled-components";
 import { OrderBasket } from "./OrderBassket";
 import { cartContext } from "../../store/CartContext";

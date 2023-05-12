@@ -1,15 +1,15 @@
-import React from "react";
+import React, { memo } from "react";
 import styled from "styled-components";
 import { Button } from "../UI/Button";
 
 export const TotalAmount = ({ toggleHandler, totalPrice }) => {
+
   const orderButton =
     totalPrice > 0 ? (
       <Button fontWeight="500" fontSize="16px" padding="10px 32px">
         Order
       </Button>
     ) : null;
-
 
   return (
     <div>
